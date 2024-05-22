@@ -20,14 +20,14 @@ const Login = ()=>{
     // {resolver: yupResolver(schema)}
     const {handleSubmit, control} = useForm()
     const submission = (data)=>{
-        AxiosInstance.post(`api/web/login`,{
+        AxiosInstance.post(`api/web/login/`,{
             email:data.email,
             password: data.password,
         })
         .then((response) =>{
             console.log(response)
             localStorage.setItem('Token', response.data.token)
-            navigate(`/home`)
+            navigate(`/`)
         })
         .catch((error) =>{
             control.error('error during login',  error)

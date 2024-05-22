@@ -41,7 +41,7 @@ const Register = ()=>{
                         <MyButton label={"Register"} type = {"submit"}/>
                     </Box>
                     <Box className={"itemBox"}>
-                        <Link to = "/" >Already registred? Please login!</Link>
+                        <Link to = "/login" >Already registred? Please login!</Link>
                     </Box>  
                 </Box>
             </form>

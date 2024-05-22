@@ -16,6 +16,8 @@ import AccountCircle from '@mui/icons-material/AccountCircle';
 import MailIcon from '@mui/icons-material/Mail';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import MoreIcon from '@mui/icons-material/MoreVert';
+import { Link, Navigate, useNavigate } from 'react-router-dom'
+import AxiosInstance from './AxiosInstante';
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
   borderRadius: theme.shape.borderRadius,
@@ -56,6 +58,8 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 export default function PrimarySearchAppBar() {
+  const navigate = useNavigate()
+  const token = localStorage.getItem('Token')  
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
 
@@ -69,6 +73,21 @@ export default function PrimarySearchAppBar() {
   const handleMobileMenuClose = () => {
     setMobileMoreAnchorEl(null);
   };
+
+  const testusser = () =>{
+    AxiosInstance.get('api/web/user/',{}).then((res)=>{
+      console.log(res.data)
+    })
+  }
+
+  const handleLogout = () =>{
+    AxiosInstance.post('logoutall/', {}).then(()=>{
+      setAnchorEl(null);
+      handleMobileMenuClose();
+      localStorage.removeItem('Token')
+      navigate('/')
+    })
+  }
 
   const handleMenuClose = () => {
     setAnchorEl(null);
@@ -96,8 +115,8 @@ export default function PrimarySearchAppBar() {
       open={isMenuOpen}
       onClose={handleMenuClose}
     >
-      <MenuItem onClick={handleMenuClose}>Thông tin tài khoản</MenuItem>
-      <MenuItem onClick={handleMenuClose}>Đăng xuất</MenuItem>
+      <MenuItem onClick={testusser}>Thông tin tài khoản</MenuItem>
+      <MenuItem onClick={handleLogout}>Đăng xuất</MenuItem>
     </Menu>
   );
 
@@ -184,7 +203,7 @@ export default function PrimarySearchAppBar() {
             />
           </Search>
           <Box sx={{ flexGrow: 1 }} />
-          <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
+          {token?  <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
             <IconButton
               size="large"
               color="inherit"
@@ -204,7 +223,9 @@ export default function PrimarySearchAppBar() {
             >
               <AccountCircle />
             </IconButton>
-          </Box>
+          </Box>: <Box>
+          <Link to = "/login" >Đăng nhập</Link>
+          </Box>}
           <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
             <IconButton
               size="large"

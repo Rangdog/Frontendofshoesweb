@@ -7,15 +7,21 @@ import About from './components/About'
 import NavbarForAdmin from './components/NavbarForAdmin'
 import Navbar from './components/Navbar'
 import './App.css'
+import { SnackbarProvider } from 'notistack';
 
 function App() {
   const location = useLocation()
-  const noNavbar = location.pathname === "/register" || location.pathname === "/" || location.pathname.includes("password")
+  const noNavbar = location.pathname === "/register" || location.pathname === "/" || location.pathname.includes("password") || location.pathname.includes("login")
   return (
    <>
       {noNavbar? 
       <Routes>
-          <Route path= "/" element={<Home/>}/>
+          <Route path= "/" element={
+            <SnackbarProvider maxSnack={3} anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
+              <Home/>
+            </SnackbarProvider>
+          }/>
+          <Route path='/login' element={<Login/>}/>
           <Route path= "/register" element={<Register/>}/>
           {/* <Route path= "/request/password_reset" element={<PasswordResetRequest/>}/>
           <Route path= "/password-reset/:token" element={<PasswordReset/>}/> */}
