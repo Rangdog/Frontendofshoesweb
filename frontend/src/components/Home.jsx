@@ -7,9 +7,10 @@ import AxiosInstance from './AxiosInstante';
 import {useSnackbar } from 'notistack';
 const Home = ()=>{
     const { enqueueSnackbar } = useSnackbar();
-    const handleBuyClick = ()=>{
+    const handleBuyClick = (productId)=>{
         const token = localStorage.getItem('Token')  
         if(token){
+            
             enqueueSnackbar('Bạn đã thêm sản phẩm vào giỏ hàng',  {
                 variant: 'success', // Đặt thành dạng success
                 autoHideDuration: 3000, // 3000ms = 3 giây
@@ -37,11 +38,10 @@ const Home = ()=>{
     },[])
     return(
         <>
-            <Navbar/>
             <Box mt={12}>
                 <Container>
                     <Typography variant="h3" align="center" gutterBottom>
-                    Welcome to the Shoe Store
+                    Chào mừng đến với shoes shop!
                     </Typography>
                     <Grid container spacing={4}>
                     {products.length > 0 ? (
@@ -71,7 +71,7 @@ const Home = ()=>{
                                                     color: '#000000', // Màu chữ khi hover tùy chỉnh
                                                 },
                                                 }} fullWidth
-                                                onClick={handleBuyClick}>
+                                                onClick={() => handleBuyClick(product.id)}>
                                             Thêm vào giỏ hàng
                                         </Button>
                                     </Card>

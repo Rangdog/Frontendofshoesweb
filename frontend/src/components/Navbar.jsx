@@ -18,6 +18,7 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 import MoreIcon from '@mui/icons-material/MoreVert';
 import { Link, Navigate, useNavigate } from 'react-router-dom'
 import AxiosInstance from './AxiosInstante';
+import {useEffect, useMemo, useState} from 'react'
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
   borderRadius: theme.shape.borderRadius,
@@ -58,6 +59,16 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 export default function PrimarySearchAppBar() {
+  const [cartItem, setcartItem] = useState([])
+  const getCartItem = async() =>{
+      try {
+          const res = await AxiosInstance.get("api/listcartitem/");
+          setcartItem(res.data);
+          console.log(res.data);
+      } catch (error) {
+          console.error('Error fetching products:', error);
+      }
+  }
   const navigate = useNavigate()
   const token = localStorage.getItem('Token')  
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -97,6 +108,10 @@ export default function PrimarySearchAppBar() {
   const handleMobileMenuOpen = (event) => {
     setMobileMoreAnchorEl(event.currentTarget);
   };
+
+  const handleShoppingCartIcon = () =>{
+    navigate('/cart')
+  }
 
   const menuId = 'primary-search-account-menu';
   const renderMenu = (
@@ -171,7 +186,9 @@ export default function PrimarySearchAppBar() {
       </MenuItem>
     </Menu>
   );
-
+  useEffect(()=>{
+      getCartItem();
+  },[])
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static" sx={{ backgroundColor: '#FF5733', color: '#FFFFFF' }}>
@@ -208,8 +225,8 @@ export default function PrimarySearchAppBar() {
               size="large"
               color="inherit"
             >
-              <Badge badgeContent={17} color="error">
-                <ShoppingCartIcon />
+              <Badge badgeContent={cartItem.length} color="error">
+                <ShoppingCartIcon onClick = {handleShoppingCartIcon}  />
               </Badge>
             </IconButton>
             <IconButton
