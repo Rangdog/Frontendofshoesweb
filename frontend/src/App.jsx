@@ -9,6 +9,7 @@ import Navbar from './components/Navbar'
 import './App.css'
 import { SnackbarProvider } from 'notistack';
 import Cart from './components/Cart'
+import Order from './components/Order'
 
 function App() {
   const location = useLocation()
@@ -38,11 +39,16 @@ function App() {
   // )
       return (
         <SnackbarProvider maxSnack={3} anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
-                  <Navbar />
-                  <Routes>
-                    <Route path= "/" element={<Home/>} />
-                    <Route path="/cart" element={<Cart/>} />
-                </Routes>
+                  <Navbar/>
+                  <div style={{ paddingTop: '64px' }}> {/* Chỗ này là đặt padding-top để tránh bị che bởi Navbar */}
+                    <Routes>
+                      {/* <Route path="/" element={<Home />} /> */}
+                      <Route path="/" element={<Order />} />
+                      <Route path="/login" element={<Login />} />
+                      <Route path="/register" element={<Register />} />
+                      <Route path="/cart" element={<Cart />} />
+                    </Routes>
+                  </div>
         </SnackbarProvider>
       );
   }

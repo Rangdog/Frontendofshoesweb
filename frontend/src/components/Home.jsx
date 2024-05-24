@@ -5,16 +5,29 @@ import Navbar from './Navbar'
 import { AppBar, Toolbar, Typography, Container, Grid, Card, CardMedia, CardContent, Button } from '@mui/material';
 import AxiosInstance from './AxiosInstante';
 import {useSnackbar } from 'notistack';
+import { Api } from '@mui/icons-material';
 const Home = ()=>{
     const { enqueueSnackbar } = useSnackbar();
-    const handleBuyClick = (productId)=>{
+    const handleBuyClick = (productID)=>{
         const token = localStorage.getItem('Token')  
         if(token){
-            
-            enqueueSnackbar('Bạn đã thêm sản phẩm vào giỏ hàng',  {
-                variant: 'success', // Đặt thành dạng success
-                autoHideDuration: 3000, // 3000ms = 3 giây
-              });
+            AxiosInstance.post(`api/cartitem/`,{
+                productId:productID,
+            }).then((res)=>{
+                if(res.status === 201){
+                    window.dispatchEvent(new Event('updateCartItems'));
+                    enqueueSnackbar('Bạn đã thêm sản phẩm vào giỏ hàng',  {
+                        variant: 'success', // Đặt thành dạng success
+                        autoHideDuration: 3000, // 3000ms = 3 giây
+                    });
+                }
+                else{
+                    enqueueSnackbar('Có lỗi xảy ra khi thêm sản phẩm vào giỏ hàng', {
+                        variant: 'error',
+                        autoHideDuration: 3000,
+                    });
+                }
+            })
         }
         else{
             enqueueSnackbar('Vui lòng đăng nhập',  {

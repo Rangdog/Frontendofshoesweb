@@ -188,9 +188,18 @@ export default function PrimarySearchAppBar() {
   );
   useEffect(()=>{
       getCartItem();
+      window.addEventListener('updateCartItems', getCartItem);
+
+      return () => {
+        // Clean up event listener
+        window.removeEventListener('updateCartItems', getCartItem);
+      };
   },[])
+  const handleClickShopShoes = ()=>{
+    navigate("/")
+  }
   return (
-    <Box sx={{ flexGrow: 1 }}>
+    <Box sx={{ flexGrow: 1, width: '100%', position: 'fixed', left: 0, right: 0 }}>
       <AppBar position="static" sx={{ backgroundColor: '#FF5733', color: '#FFFFFF' }}>
         <Toolbar>
           <IconButton
@@ -207,6 +216,7 @@ export default function PrimarySearchAppBar() {
             noWrap
             component="div"
             sx={{ display: { xs: 'none', sm: 'block' } }}
+            onClick={handleClickShopShoes}
           >
             SHOP SHOES
           </Typography>

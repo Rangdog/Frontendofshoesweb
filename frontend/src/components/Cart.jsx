@@ -24,6 +24,44 @@ const Cart = ()=>{
             variant: 'success',
             autoHideDuration: 3000,
         });
+
+    }
+    const handleDecreaseQuantity = (id) =>{
+        AxiosInstance.patch(`api/cartitemdecreasequantity/${id}/`,{}).then((res)=>{
+            if(res.status === 200){
+                enqueueSnackbar('Giảm số lượng sản phẩm thành công',  {
+                    variant: 'success', // Đặt thành dạng success
+                    autoHideDuration: 3000, // 3000ms = 3 giây
+                })
+                getCartItem();
+            }
+        }
+        ).catch(()=>{       
+            enqueueSnackbar('Không thể giảm số lượng sản phẩm',  {
+                variant: 'error', // Đặt thành dạng success
+                autoHideDuration: 3000, // 3000ms = 3 giây
+            })
+        })
+    }
+    const handleIncreaseQuantity = (id) =>{
+        AxiosInstance.patch(`api/cartitemincreasequantity/${id}/`,{}).then(()=>{
+            enqueueSnackbar('Tăng số lượng sản phẩm thành công',  {
+                variant: 'success', // Đặt thành dạng success
+                autoHideDuration: 3000, // 3000ms = 3 giây
+            })
+            getCartItem();
+        }
+        )
+    }
+    const handleBtnDelete = (id) =>{
+        AxiosInstance.delete(`api/cartitem/${id}/`,{}).then(()=>{
+            enqueueSnackbar('Xóa thành công',  {
+                variant: 'success', // Đặt thành dạng success
+                autoHideDuration: 3000, // 3000ms = 3 giây
+            })
+            getCartItem();
+        }
+        )
     }
     useEffect(()=>{
         getCartItem();
@@ -33,7 +71,7 @@ const Cart = ()=>{
             <Typography variant="h3" align="center" gutterBottom paddingTop="20px">
                 Giỏ hàng của bạn
             </Typography>
-            <Grid container spacing={4} direction="row" wrap="nowrap">
+            <Grid container spacing={4} direction="row">
                 {cartItems.length > 0? (
                     cartItems.map((item) => (
                         <Grid item key = {item.id} xs={12}>
@@ -68,7 +106,8 @@ const Cart = ()=>{
                                                 color: '#000000',
                                             },
                                         }}
-                                        fullWidth>
+                                        fullWidth
+                                        onClick={() => handleBtnDelete(item.id)}>
                                         Xóa
                                     </Button>
                                 </Box>
