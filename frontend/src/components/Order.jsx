@@ -1,11 +1,12 @@
-
 import React, { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import { TextField, Container, Typography, Button, Box, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
-import {yupResolver} from '@hookform/resolvers/yup'
-import * as yup from 'yup'
+import { yupResolver } from '@hookform/resolvers/yup';
+import { useForm, Controller } from 'react-hook-form';
+import * as yup from 'yup';
+
 // Thiết lập icon cho marker
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -13,8 +14,8 @@ L.Icon.Default.mergeOptions({
   iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png'
 });
-const Order = ()=>{
-    const [inputValue, setInputValue] = useState('');
+
+const Order = () => {
   const [address, setAddress] = useState('');
   const [openMap, setOpenMap] = useState(false);
   const [selectedPosition, setSelectedPosition] = useState(null);
@@ -83,7 +84,7 @@ const Order = ()=>{
 
   const fetchAddressByInput = async () => {
     try {
-      const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${inputValue}&countrycodes=VN`);
+      const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${getValues('address')}&countrycodes=VN`);
       const data = await response.json();
 
       console.log('API Data:', data); // Kiểm tra dữ liệu trả về từ API
@@ -115,6 +116,7 @@ const Order = ()=>{
   const handleConfirmAddress = () => {
     if (selectedPosition) {
       setAddress(tempAddress);
+      setValue('address', tempAddress); // Update the form value for address
       setOpenMap(false);
     }
   };
@@ -131,107 +133,125 @@ const Order = ()=>{
       <Marker position={selectedPosition}></Marker>
     );
   };
-  const schema = yup
-    .object({
-        email:yup.string().email('Field expects an email adress').required('Email is a required field'),
-        password: yup.string().required('Password is a required field').min(8,'Password must be at least 8 characters').matches(/[A-Z]/, 'Password must contain at least one uppercase letter')
-        .matches(/[a-z]/, 'Password must contain at least one lower case letter')
-        .matches(/[0-9]/, 'Password must contain at least one number letter')
-        .matches(/[!@#$%^&*()<>?:"{}[]|\+-_=]/, 'Password must contain at least one special character letter'),
-        password2: yup.string().required('Password confirmation is a required field')
-        .oneOf([yup.ref('password'), null], 'Password must match')
-    })
 
-    const {handleSubmit, control} = useForm({resolver: yupResolver(schema)})
-  const submission = (data)=>{
-    AxiosInstance.post(`register/`,{
-        email:data.email,
-        password: data.password,
-    })
-    .then(() =>{
-        navigate(`/`)
-    })
-}
+  const schema = yup.object({
+    address: yup.string().required('Address is required'),
+    phoneNumber: yup.string().required('Phone number is required').matches(/^[0-9]+$/, 'Phone number is not valid'),
+    email: yup.string().email('Field expects an email address').required('Email is a required field'),
+    password: yup.string().required('Password is a required field').min(8, 'Password must be at least 8 characters').matches(/[A-Z]/, 'Password must contain at least one uppercase letter')
+      .matches(/[a-z]/, 'Password must contain at least one lower case letter')
+      .matches(/[0-9]/, 'Password must contain at least one number')
+      .matches(/[!@#$%^&*()<>?:"{}[\]|\\+-_=]/, 'Password must contain at least one special character'),
+    password2: yup.string().required('Password confirmation is a required field')
+      .oneOf([yup.ref('password'), null], 'Password must match')
+  });
+
+
+  const { register, handleSubmit, formState: { errors }, setValue, getValues } = useForm({
+    resolver: yupResolver(schema),
+  });
+
+  const submission = (data) => {
+    console.log(data);
+    // AxiosInstance.post(`register/`,{
+    //     email:data.email,
+    //     password: data.password,
+    // })
+    // .then(() =>{
+    //     navigate(`/`)
+    // })
+  };
+
   return (
-    <>
-        <form onSubmit={handleSubmit(submission)}>
-            <Container>
-            <Typography variant="h4" gutterBottom>
-                Địa Chỉ
-            </Typography>
-            <Box display="flex" alignItems="center">
-                <TextField
-                label="Nhập địa chỉ"
-                variant="outlined"
-                fullWidth
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                onKeyDown={handleKeyDown}
-                name = {"address"}
-                />
-                <Button 
-                variant="contained" 
-                color="primary" 
-                onClick={handleClick}
-                sx={{ marginLeft: 2 }}
-                >
-                Chọn
-                </Button>
-                <Button 
-                variant="contained" 
-                color="secondary" 
-                onClick={handleOpenMap}
-                sx={{ marginLeft: 2 }}
-                >
-                Chọn địa chỉ trên bản đồ
-                </Button>
-            </Box>
-            <Typography variant="h6" gutterBottom>
-                Kết quả: {address}
-            </Typography>
+    <Container>
+      <form onSubmit={handleSubmit(submission)}>
+        <Typography variant="h4" gutterBottom>
+          Địa Chỉ
+        </Typography>
+        <Box display="flex" alignItems="center">
+          <TextField
+            label="Nhập địa chỉ"
+            variant="outlined"
+            fullWidth
+            onKeyDown={handleKeyDown}
+            {...register('address')}
+            error={!!errors.address}
+            helperText={errors.address ? errors.address.message : ''}
+          />
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleClick}
+            sx={{ marginLeft: 2 }}
+          >
+            Chọn
+          </Button>
+          <Button
+            variant="contained"
+            color="secondary"
+            onClick={handleOpenMap}
+            sx={{ marginLeft: 2 }}
+          >
+            Chọn địa chỉ trên bản đồ
+          </Button>
+        </Box>
+        <Typography variant="h6" gutterBottom>
+          Kết quả: {address}
+        </Typography>
 
-            <Dialog open={openMap} onClose={handleCloseMap} maxWidth="md" fullWidth>
-                <DialogTitle>Chọn địa chỉ trên bản đồ</DialogTitle>
-                <DialogContent>
-                <MapContainer center={userPosition} zoom={13} style={{ height: '400px' }}>
-                    <TileLayer
-                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                    />
-                    <LocationMarker />
-                </MapContainer>
-                <Typography variant="body1" sx={{ marginTop: 2 }}>
-                    Địa chỉ tạm thời: {tempAddress}
-                </Typography>
-                </DialogContent>
-                <DialogActions>
-                <Button onClick={handleCloseMap} color="primary">
-                    Hủy bỏ
-                </Button>
-                <Button onClick={handleConfirmAddress} color="primary">
-                    Xác nhận
-                </Button>
-                </DialogActions>
-            </Dialog>
-            </Container>
-            <Container>
-                <Typography variant="h4" gutterBottom>
-                    Số điện thoại
-                </Typography>
-                <Box display="flex" alignItems="center" sx = {{width: '75%'}}>
-                    <TextField
-                    label="Nhập số điện thoại"
-                    variant="outlined"
-                    fullWidth
-                    value={inputValue}
-                    onChange={(e) => setInputValue(e.target.value)}
-                    name = {"number"}
-                    />
-                </Box>
-            </Container>
-        </form>
-    </>
+        <Dialog open={openMap} onClose={handleCloseMap} maxWidth="md" fullWidth>
+          <DialogTitle>Chọn địa chỉ trên bản đồ</DialogTitle>
+          <DialogContent>
+            <MapContainer center={userPosition} zoom={13} style={{ height: '400px' }}>
+              <TileLayer
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+              />
+              <LocationMarker />
+            </MapContainer>
+            <Typography variant="body1" sx={{ marginTop: 2 }}>
+              Địa chỉ tạm thời: {tempAddress}
+            </Typography>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseMap} color="primary">
+              Hủy bỏ
+            </Button>
+            <Button onClick={handleConfirmAddress} color="primary">
+              Xác nhận
+            </Button>
+          </DialogActions>
+        </Dialog>
+        <Typography variant="h4" gutterBottom>
+          Số điện thoại
+        </Typography>
+        <Box display="flex" alignItems="center" sx={{ width: '75%' }}>
+          <TextField
+            label="Nhập số điện thoại"
+            variant="outlined"
+            fullWidth
+            {...register('phoneNumber')}
+            error={!!errors.phoneNumber}
+            helperText={errors.phoneNumber ? errors.phoneNumber.message : ''}
+          />
+        </Box>
+        <Button
+          variant="contained"
+          color="primary"
+          type="submit"
+          sx={{
+            margin: '10px 0px',
+            backgroundColor: '#28a745',
+            '&:hover': {
+              backgroundColor: '#218838',
+            },
+          }}
+        >
+          Đặt hàng
+        </Button>
+      </form>
+    </Container>
   );
 }
 
-export default Order
+export default Order;

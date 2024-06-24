@@ -43,7 +43,7 @@ function App() {
                   <div style={{ paddingTop: '64px' }}> {/* Chỗ này là đặt padding-top để tránh bị che bởi Navbar */}
                     <Routes>
                       {/* <Route path="/" element={<Home />} /> */}
-                      <Route path="/" element={<Order />} />
+                      <Route path="/" element={<Home />} />
                       <Route path="/login" element={<Login />} />
                       <Route path="/register" element={<Register />} />
                       <Route path="/cart" element={<Cart />} />
