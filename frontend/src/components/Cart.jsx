@@ -19,13 +19,6 @@ const Cart = ()=>{
     const calculateTotalPrice = () => {
         return cartItems.reduce((total, item) => total + item.product.price * item.quantity, 0);
     }
-    const handleOrder = () => {
-        enqueueSnackbar('Đặt hàng thành công', {
-            variant: 'success',
-            autoHideDuration: 3000,
-        });
-
-    }
     const handleDecreaseQuantity = (id) =>{
         AxiosInstance.patch(`api/cartitemdecreasequantity/${id}/`,{}).then((res)=>{
             if(res.status === 200){
@@ -116,9 +109,11 @@ const Cart = ()=>{
                             </Grid>
                         ))
                     ): (
-                        <Typography variant="h6" align="center" gutterBottom>
-                            Your cart is empty
-                        </Typography>
+                        <Container sx= {{margin: '20px 0'}}>
+                            <Typography variant="h5" align="center" gutterBottom color="#FF9900">
+                                Giỏ hàng của bạn đang trống
+                            </Typography>
+                        </Container>
                     )}
                 </Grid>
                 {cartItems.length > 0 && (
@@ -129,7 +124,7 @@ const Cart = ()=>{
                     </Box>
                 )}
             </Container>
-            <Order/>
+            <Order cartItems = {cartItems} total = {calculateTotalPrice()} getCratItem = {getCartItem}/>
         </>
     )
 }

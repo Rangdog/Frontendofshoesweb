@@ -2,10 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
-import { TextField, Container, Typography, Button, Box, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
+import { TextField, Container, Typography, Button, Box, Dialog, DialogActions, DialogContent, DialogTitle, MenuItem } from '@mui/material';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useForm, Controller } from 'react-hook-form';
 import * as yup from 'yup';
+import AxiosInstance from './AxiosInstante';
+import {useSnackbar} from 'notistack'
 
 // Thiết lập icon cho marker
 delete L.Icon.Default.prototype._getIconUrl;
@@ -15,13 +17,18 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png'
 });
 
-const Order = () => {
+const Order = ( props ) => {
+
   const [address, setAddress] = useState('');
   const [openMap, setOpenMap] = useState(false);
   const [selectedPosition, setSelectedPosition] = useState(null);
   const [tempAddress, setTempAddress] = useState('');
   const [userPosition, setUserPosition] = useState([21.028511, 105.804817]); // Default to Hanoi
+  const { enqueueSnackbar } = useSnackbar()
 
+  const listProduct = props.cartItems
+  const total = props.total
+  const getCartItems = props.getCratItem
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -137,13 +144,6 @@ const Order = () => {
   const schema = yup.object({
     address: yup.string().required('Address is required'),
     phoneNumber: yup.string().required('Phone number is required').matches(/^[0-9]+$/, 'Phone number is not valid'),
-    email: yup.string().email('Field expects an email address').required('Email is a required field'),
-    password: yup.string().required('Password is a required field').min(8, 'Password must be at least 8 characters').matches(/[A-Z]/, 'Password must contain at least one uppercase letter')
-      .matches(/[a-z]/, 'Password must contain at least one lower case letter')
-      .matches(/[0-9]/, 'Password must contain at least one number')
-      .matches(/[!@#$%^&*()<>?:"{}[\]|\\+-_=]/, 'Password must contain at least one special character'),
-    password2: yup.string().required('Password confirmation is a required field')
-      .oneOf([yup.ref('password'), null], 'Password must match')
   });
 
 
@@ -151,15 +151,26 @@ const Order = () => {
     resolver: yupResolver(schema),
   });
 
-  const submission = (data) => {
-    console.log(data);
-    // AxiosInstance.post(`register/`,{
-    //     email:data.email,
-    //     password: data.password,
-    // })
-    // .then(() =>{
-    //     navigate(`/`)
-    // })
+  const submission = async (data) => {
+    try{
+      const res = await AxiosInstance.post(`api/createorder/`,{
+        address:data.address,
+        number: data.number,
+        total: total,
+        product: listProduct,
+        paymentMethod: data.paymentMethod,
+      })
+      if(res.status === 200){
+        enqueueSnackbar("Thành công", {variant : 'success', autoHideduration : 3000});
+        getCartItems()
+      }
+      else{
+        enqueueSnackbar("Thất bại", {variant : 'error', autoHideduration : 3000});
+      }
+    }
+    catch(e){
+      console.log(e)
+    }
   };
 
   return (
@@ -173,6 +184,7 @@ const Order = () => {
             label="Nhập địa chỉ"
             variant="outlined"
             fullWidth
+            focused
             onKeyDown={handleKeyDown}
             {...register('address')}
             error={!!errors.address}
@@ -235,7 +247,22 @@ const Order = () => {
             helperText={errors.phoneNumber ? errors.phoneNumber.message : ''}
           />
         </Box>
+        <Typography variant="h4" gutterBotton>
+          Phương thức thanh toán
+        </Typography>
+        <Box display="flex" alignItems="center" sx= {{width: '75%' , marginTop: '10px'}}>
+          <TextField
+            select
+            label = "Chọn phương thức thanh toán"
+            variant = "outlined"
+            fullWidth
+            {...register('paymentMethod')}
+          >
+            <MenuItem key = {1} value = {1}>Thanh toán bằng tiền mặt</MenuItem>
+          </TextField>
+        </Box>
         <Button
+          disabled = {listProduct.length == 0}
           variant="contained"
           color="primary"
           type="submit"

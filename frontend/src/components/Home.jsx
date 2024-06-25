@@ -4,7 +4,7 @@ import { Box } from "@mui/material"
 import Navbar from './Navbar'
 import { AppBar, Toolbar, Typography, Container, Grid, Card, CardMedia, CardContent, Button } from '@mui/material';
 import AxiosInstance from './AxiosInstante';
-import {useSnackbar } from 'notistack';
+import {useSnackbar} from 'notistack';
 import { Api } from '@mui/icons-material';
 const Home = ()=>{
     const { enqueueSnackbar } = useSnackbar();

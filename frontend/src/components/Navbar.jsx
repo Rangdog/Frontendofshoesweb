@@ -91,6 +91,10 @@ export default function PrimarySearchAppBar() {
     })
   }
 
+  const historyOrder = () =>{
+    navigate('/')
+  }
+
   const handleLogout = () =>{
     AxiosInstance.post('logoutall/', {}).then(()=>{
       setAnchorEl(null);
@@ -131,6 +135,7 @@ export default function PrimarySearchAppBar() {
       onClose={handleMenuClose}
     >
       <MenuItem onClick={testusser}>Thông tin tài khoản</MenuItem>
+      <MenuItem onClick={historyOrder}>Lịch sử đơn hàng</MenuItem>
       <MenuItem onClick={handleLogout}>Đăng xuất</MenuItem>
     </Menu>
   );
@@ -200,7 +205,7 @@ export default function PrimarySearchAppBar() {
   }
   return (
     <Box sx={{ flexGrow: 1, width: '100%', position: 'fixed', left: 0, right: 0 }}>
-      <AppBar position="static" sx={{ backgroundColor: '#FF5733', color: '#FFFFFF' }}>
+      <AppBar position="static" sx={{ backgroundColor: '#000080', color: '#FFFFFF' }}>
         <Toolbar>
           <IconButton
             size="large"
